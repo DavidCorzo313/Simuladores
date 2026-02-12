@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Resumen Radicación</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="resumen-container">
+
+  <h2>RADICACIÓN EXITOSA</h2>
+
+  <div class="card">
+    <p><strong>NR/CUN:</strong> <span id="pqrId"></span></p>
+    <p><strong>Fecha:</strong> <span id="fecha"></span></p>
+    <p><strong>Número Móvil:</strong> <span id="numero"></span></p>
+    <p><strong>Identificación:</strong> <span id="identificacion"></span></p>
+    <p><strong>Nombre:</strong> <span id="nombre"></span></p>
+    <p><strong>Tipo PQR:</strong> <span id="tipo"></span></p>
+    <p><strong>Área Responsable:</strong> <span id="area"></span></p>
+  </div>
+
+  <div class="acciones">
+    <button onclick="volver()">Nueva Radicación</button>
+  </div>
+
+</div>
+
+<script>
+
+const datos = JSON.parse(localStorage.getItem("resumenPQR"));
+
+if(datos){
+  document.getElementById("pqrId").innerText = datos.id;
+  document.getElementById("fecha").innerText = datos.fecha;
+  document.getElementById("numero").innerText = datos.numero_movil || "-";
+  document.getElementById("identificacion").innerText = datos.identificacion || "-";
+  document.getElementById("nombre").innerText = (datos.nombres || "") + " " + (datos.apellidos || "");
+  document.getElementById("tipo").innerText = datos.tipo_pqr || "-";
+  document.getElementById("area").innerText = datos.area_responsable || "-";
+}
+
+function volver(){
+  window.location.href = "radicar.html";
+}
+
+</script>
+
+</body>
+</html>
