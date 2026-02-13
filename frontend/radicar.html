@@ -1,41 +1,792 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<link rel="stylesheet" href="css/styles.css">
+    <meta charset="UTF-8">
+    <title>Simulador Gestión PQR´s - Full Detalle</title>
+    <style>
+        :root {
+            --win-gray: #d4d0c8;
+            --win-border-light: #ffffff;
+            --win-border-dark: #808080;
+            --claro-red: #e1251b;
+        }
+
+        body {
+            background-color: #316ac5;
+            margin: 0;
+            padding: 10px;
+            font-family: 'Tahoma', sans-serif;
+            font-size: 11px;
+            user-select: none;
+        }
+
+        .main-window {
+            background-color: var(--win-gray);
+            border: 2px solid;
+            border-color: var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);
+            width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* HEADER */
+        header {
+            background: white;
+            padding: 5px 10px;
+            border-bottom: 1px solid #808080;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo { width: 180px; display: flex; align-items: center; }
+        .header-logo img { height: 35px; margin-right: 8px; }
+        .header-info { flex-grow: 1; line-height: 1.3; }
+        .header-version { text-align: right; width: 150px; }
+
+        /* CUERPO */
+        .app-container { display: flex; flex-grow: 1; height: 750px; }
+
+        /* BARRA LATERAL IZQUIERDA */
+        .sidebar-tabs {
+            width: 32px;
+            background: #b0b0b0;
+            border-right: 1px solid #808080;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .v-tab {
+            writing-mode: vertical-lr;
+            transform: rotate(180deg);
+            padding: 12px 4px;
+            border: 1px solid #808080;
+            margin-bottom: -1px;
+            background: var(--win-gray);
+            cursor: not-allowed;
+            color: #555;
+        }
+
+        .v-tab.active { background: #f0f0f0; font-weight: bold; color: #000; cursor: pointer; border-right: none; }
+
+        /* MENU DE PROCESOS */
+        .menu-nav {
+            width: 180px;
+            border-right: 1px solid #808080;
+            background: #eee;
+            padding: 10px 0;
+        }
+
+        .group-title { font-weight: bold; text-decoration: underline; padding: 10px 15px 5px; display: block; }
+        .menu-item { display: block; padding: 3px 25px; text-decoration: none; color: black; cursor: default; }
+        .menu-item.enabled { cursor: pointer; background: #000080; color: white; }
+        .menu-item.disabled { color: #888; }
+
+        /* ÁREA DE RADICACIÓN */
+        .workspace { flex-grow: 1; padding: 8px; background: #c0c0c0; position: relative; }
+
+        .internal-win {
+            border: 1px solid #808080;
+            background: var(--win-gray);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .win-title { background: #ece9d8; padding: 2px 8px; border-bottom: 1px solid #808080; font-weight: bold; display: flex; justify-content: space-between; }
+
+        .tabs-row { display: flex; padding: 4px 4px 0; background: #ece9d8; }
+        .tab-btn { padding: 3px 12px; border: 1px solid #808080; border-bottom: none; background: #d4d0c8; border-radius: 3px 3px 0 0; margin-right: 2px; }
+        .tab-btn.active { background: var(--win-gray); font-weight: bold; position: relative; bottom: -1px; }
+
+        /* CONTENEDOR DE FORMULARIO */
+        .form-content {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .f-group { display: flex; align-items: center; gap: 4px; }
+        .f-group label { white-space: nowrap; font-size: 11px; }
+        
+        input, select { 
+            border: 1px solid #7a7a7a; 
+            padding: 1px 2px; 
+            font-size: 11px; 
+            height: 18px; 
+            background: white;
+        }
+
+        input[readonly] { background: #e1e1e1; color: #555; }
+
+        .btn-red-form {
+            background: #b31d16;
+            color: white;
+            border: 1px solid #000;
+            font-size: 10px;
+            height: 18px;
+            padding: 0 5px;
+            cursor: pointer;
+            min-width: 70px;
+        }
+
+        /* TEXTAREAS */
+        .text-area-group { display: flex; flex-direction: column; margin-top: 5px; }
+        .text-area-group label { margin-bottom: 2px; }
+        textarea { border: 1px solid #7a7a7a; width: 100%; font-family: Tahoma; font-size: 11px; resize: none; }
+
+        /* FOOTER */
+        .footer-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+            margin-top: auto;
+        }
+
+        .btn-win {
+            padding: 3px 25px;
+            border: 2px solid;
+            border-color: #fff #808080 #808080 #fff;
+            background: var(--win-gray);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-win.red { background: #b31d16; color: white; border-color: #e1251b #8a1711 #8a1711 #e1251b; }
+
+        /* --- ESTILOS DEL APARTADO DE DIRECCIÓN (MODAL) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3);
+            display: none; /* Se activa con JS */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-dir {
+            background: var(--win-gray);
+            border: 2px solid;
+            border-color: var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);
+            width: 550px;
+            box-shadow: 2px 2px 15px rgba(0,0,0,0.4);
+        }
+
+        .modal-header {
+            background: #ece9d8;
+            padding: 4px 8px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #808080;
+        }
+
+        .modal-body { padding: 12px; }
+
+        .dir-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px 15px;
+            margin-bottom: 15px;
+        }
+
+        .dir-field { display: flex; flex-direction: column; }
+        .dir-field label { font-size: 10px; margin-bottom: 2px; }
+        .dir-field select, .dir-field input { width: 100%; }
+
+        .dir-footer {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            border-top: 1px solid #808080;
+            padding-top: 10px;
+        }
+
+        .close-btn { cursor: pointer; }
+        /* === AVISO IA PEQUEÑO === */
+        .ai-mini {
+            display: inline-block;
+            margin-left: 8px;
+            background: #fff;
+            border: 1px solid #808080;
+            padding: 2px 6px;
+            font-size: 10px;
+            cursor: pointer;
+            box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+        }
+
+        .ai-mini:hover {
+            background: #eaeaea;
+        }
+        /* === MODAL RESUMEN RADICACION === */
+        .modal-resumen-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-resumen {
+            width: 700px;
+            background: #f5f5f5;
+            border: 2px solid #808080;
+            box-shadow: 0 0 20px rgba(0,0,0,0.6);
+            padding: 20px;
+            font-size: 12px;
+        }
+
+        .modal-resumen h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .resumen-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .resumen-box {
+            border: 1px solid #000;
+            padding: 5px;
+            background: #fff;
+            min-height: 60px;
+        }
+
+        .resumen-footer {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .resumen-footer button {
+            margin: 5px;
+            padding: 5px 20px;
+            background: #b31d16;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        /* === MODAL RADICACION EXITOSA === */
+        .modal-exito-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+        .modal-exito {
+            width: 380px;
+            background: #f5f5f5;
+            border: 2px solid #808080;
+            box-shadow: 0 0 25px rgba(0,0,0,0.6);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .modal-exito h3 {
+            margin-bottom: 10px;
+        }
+
+        .modal-exito .numero-radicado {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .modal-exito-buttons {
+            margin-top: 15px;
+        }
+
+        .modal-exito-buttons button {
+            margin: 5px;
+            padding: 5px 15px;
+            background: #b31d16;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
-<h2>Radicar PQR - RED MOVIL</h2>
+<div class="modal-overlay" id="modalDirecciones">
+    <div class="modal-dir">
+        <div class="modal-header">
+            <span>Direcciones</span>
+            <span class="close-btn" onclick="cerrarDirecciones()">X</span>
+        </div>
+        <div class="modal-body">
+            <div class="dir-grid">
+                <div class="dir-field">
+                    <label>Vía Principal</label>
+                    <select><option>CL - CALLE</option><option>AK - AVENIDA CARRERA</option></select>
+                </div>
+                <div class="dir-field">
+                    <label>Número</label>
+                    <input type="text">
+                </div>
+                <div class="dir-field">
+                    <label>Letra</label>
+                    <select><option>&lt;SELECCIONAR&gt;</option></select>
+                </div>
+                <div class="dir-field">
+                    <label>Bis</label>
+                    <select><option>NO</option><option>SI</option></select>
+                </div>
+                <div class="dir-field">
+                    <label>Letra Bis</label>
+                    <select><option>&lt;SELECCIONAR&gt;</option></select>
+                </div>
+                <div class="dir-field">
+                    <label>Cuadrante</label>
+                    <select><option>&lt;SELECCIONAR&gt;</option></select>
+                </div>
+                <div class="dir-field">
+                    <label>Número Generador</label>
+                    <input type="text">
+                </div>
+                <div class="dir-field">
+                    <label>Letra</label>
+                    <select><option>&lt;SELECCIONAR&gt;</option></select>
+                </div>
+                <div class="dir-field">
+                    <label>Placa</label>
+                    <input type="text">
+                </div>
+                <div class="dir-field">
+                    <label>Cuadrante</label>
+                    <select><option>&lt;SELECCIONAR&gt;</option></select>
+                </div>
+            </div>
 
-<form id="formPQR">
+            <div class="dir-field" style="margin-bottom: 10px;">
+                <label>Complemento</label>
+                <input type="text" placeholder="Ej: Apto 809, Torre 4">
+            </div>
 
-<input name="numero_movil" placeholder="Número Móvil" required>
-<input name="identificacion" placeholder="Identificación" required>
-<input name="tipo_identificacion" placeholder="Tipo ID">
-<input name="nombres" placeholder="Nombres">
-<input name="apellidos" placeholder="Apellidos">
-<input name="direccion" placeholder="Dirección">
-<input name="barrio" placeholder="Barrio">
-<input name="telefono" placeholder="Teléfono">
-<input name="plan" placeholder="Plan">
-<input name="departamento" placeholder="Departamento">
-<input name="ciudad" placeholder="Ciudad">
-<input name="region" placeholder="Región">
-<input name="tipo_pqr" placeholder="Tipo PQR">
-<input name="tipologia" placeholder="Tipología">
-<input name="solicitud" placeholder="Solicitud">
-<input name="area_responsable" placeholder="Área Responsable">
+            <div class="dir-field">
+                <label>Dirección Resultante</label>
+                <input type="text" readonly style="background: #e1e1e1; font-weight: bold;">
+            </div>
 
-<textarea name="causal" placeholder="Causal"></textarea>
-<textarea name="hechos" placeholder="Hechos"></textarea>
-<textarea name="requerimientos" placeholder="Requerimientos"></textarea>
-<textarea name="comentarios" placeholder="Comentarios"></textarea>
+            <div class="dir-footer">
+                <button class="btn-win" onclick="cerrarDirecciones()">Aceptar</button>
+                <button class="btn-win" onclick="cerrarDirecciones()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-<button type="submit">Guardar</button>
+<div class="main-window">
+    <header>
+        <div class="header-logo">
+            <img src="img/logo claro.svg" alt="Claro" class="logo-claro">
+            <strong>Gestión PQR´s</strong>
+        </div>
+        <div class="header-info">
+            <strong>Usuario:</strong> EC0823E - INGRID DANIELA PRIETO GORDILLO (GROUPCOS) | <strong>Perfil:</strong> ACRETENCIONTEMP<br>
+            <strong>Servicio Asociado:</strong> 1 RED MOVIL - <strong>Área Responsable:</strong> COLOMBIANOUTS-INBOUND
+        </div>
+        <div class="header-version">
+            Versión: 4.8.0.1<br>
+            28/07/2023 11:53:53
+        </div>
+    </header>
 
-</form>
+    <div class="app-container">
+        <div class="sidebar-tabs">
+            <div class="v-tab">Administración</div>
+            <div class="v-tab">Transacciones</div>
+            <div class="v-tab active">Procesos</div>
+            <div class="v-tab">Impresión</div>
+            <div class="v-tab">Reportes</div>
+        </div>
 
-<script src="js/app.js"></script>
+        <div class="menu-nav">
+            <span class="group-title">RADICACION</span>
+            <a class="menu-item enabled">Radicación</a>
+            <span class="group-title">GESTIÓN</span>
+            <span class="menu-item disabled">Carga de Archivos</span>
+            <span class="menu-item disabled">Cierre Masivo PQR</span>
+            <span class="menu-item disabled">Pendientes</span>
+            <span class="menu-item disabled">Seguimiento</span>
+            <span class="group-title">BUSQUEDA</span>
+            <span class="menu-item disabled">Buscar</span>
+        </div>
+
+        <div class="workspace">
+            <div class="internal-win">
+                <div class="win-title">
+                    <span>Radicar PQR</span>
+                    <span>_ □ X</span>
+                </div>
+                
+                <div class="tabs-row">
+                    <div class="tab-btn active">Radicación</div>
+                    <div class="tab-btn">Datos Adicionales</div>
+                </div>
+
+                <div class="form-content">
+                    <div class="form-row">
+                        <div class="f-group"><label>No. Móvil</label><input type="text" value="3204479413" style="width: 80px;"></div>
+                        <div class="f-group"><label>No. Identificación</label><input type="text" value="1015436250" style="width: 100px;"></div>
+                        <div class="f-group"><label>Tipo</label><select style="width: 50px;"><option>C.C.</option></select></div>
+                        <div class="f-group"><label>Custcode</label><input type="text" value="1.52010513" style="width: 100px;"></div>
+                        <button class="btn-red-form">Referencias</button>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="f-group"><label>Nombres</label><input type="text" value="VICTOR DAN" style="width: 250px;"></div>
+                        <div class="f-group"><label>Apellidos</label><input type="text" value="DELGADO RESTREPO" style="width: 250px;"></div>
+                        <div class="f-group"><label>Remitente</label><input type="text" value="" style="width: 150px;"></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="f-group"><label>Dirección</label><input type="text" value="26-50 APT 809" style="width: 200px;"></div>
+                        <div class="f-group"><label>Barrio</label><input type="text" value="TR 60 TORRE 4 1" style="width: 150px;"></div>
+                        <div class="f-group"><label>Teléfono</label><input type="text" value="444" style="width: 80px;"></div>
+                        <button class="btn-red-form" onclick="abrirDirecciones()">Direcciones</button>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="f-group"><label>Plan</label><input type="text" value="Navegala L LITE Mx Tmk 23" style="width: 400px;" readonly></div>
+                        <div class="f-group"><label>Activación</label><input type="text" value="17/02/2023" style="width: 80px;" readonly></div>
+                        <input type="text" value="15" style="width: 25px; text-align: center;" readonly>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="f-group"><label>Dpto.</label><select style="width: 120px;"><option>CUNDINAMARCA</option></select></div>
+                        <div class="f-group"><label>Ciudad</label><select style="width: 120px;"><option>BOGOTA</option></select></div>
+                        <div class="f-group"><label>Región</label><input type="text" value="Oriente" style="width: 80px;" readonly></div>
+                        <div class="f-group"><label>T. PQR</label>
+                            <select id="t-pqr" style="width: 120px;">
+                                <option value="">&lt;SELECCIONAR&gt;</option>
+                                <option>Peticion</option><option>Queja</option><option>Recurso</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="f-group"><label>NR/CUN</label><input type="text" style="width: 120px;"></div>
+                        <div class="f-group"><label>E-Mail</label><input type="text" style="width: 200px;"></div>
+                        <div class="f-group"><label>Cant. Copias</label><input type="text" value="0" style="width: 30px;"></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="f-group"><label>Tipología</label>
+                            <select id="tipologia" style="width: 300px;">
+                                <option value="">&lt;SELECCIONAR&gt;</option>
+                                <option disabled>DEVOLUCIO</option>
+                                <option value="peticion">PETICION</option>
+                                <option disabled>SOLICITUD CENTRALES DE RIESGO</option>
+                                <option disabled>SOLICITUD EQ. TERMINAL LEY 1480</option>
+                                <option disabled>TRASLADOS</option>
+                            </select>
+                        </div>
+                        <div class="f-group"><label>Área Responsable</label>
+                            <select id="area-responsable" style="width: 250px;">
+                                <option value="">&lt;SELECCIONAR&gt;</option>
+                                <option value="inbound">COLOMBIANOUTS-INBOUND</option>
+                                <option disabled>GESTION ADMISION</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="f-group"><label>Solicitud</label>
+                            <select id="solicitud" style="width: 450px;">
+                                <option value="">&lt;SELECCIONAR&gt;</option>
+                                <option value="terminacion">Petic. Información terminación de contrato</option>
+                                <option value="terminacion">Petic. Modificaciones de Contrato</option>
+                                <option value="terminacion">Petic. Portabilidad</option>
+                                <option value="terminacion">Petic. Reposicion Equipo terminal</option>
+                                <option value="terminacion">Petic. Trivias Informacion DX del Servicio</option>
+                            </select>
+                        </div>
+                        <div class="f-group"><label>Recibido Claro</label><input type="text" value="28/07/2023" style="width: 80px;" readonly></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="f-group"><label>Recibido de</label><select style="width: 120px;"><option>&lt;SELECCIONAR&gt;</option><option>Usuario</option></select></div>
+                        <div class="f-group"><label>Causal</label><select id="causal" style="width: 250px;"><option>&lt;SELECCIONAR&gt;</option></select></div>
+                        <div class="f-group"><label>Segmentación</label><input type="text" value="POR DEFECTO" style="width: 100px;" readonly></div>
+                        <div class="f-group"><label>Días seg.</label><input type="text" value="15" style="width: 30px;" readonly></div>
+                    </div>
+
+                    <div class="text-area-group">
+                    <label>
+                        Hechos Manifestados
+                        <span class="ai-mini" onclick="generarTextoIA()">IA</span>
+                    </label>
+                    <textarea id="hechos" rows="2"></textarea>
+                    </div>
+
+                    <div class="text-area-group">
+                        <label>Requerimientos</label>
+                        <textarea id="requerimientos" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-row" style="margin-top: 5px;">
+                        <input type="checkbox" id="resp-inm">
+                        <label for="resp-inm">Respuesta Inmediata</label>
+                    </div>
+
+                    <div class="text-area-group">
+                        <label>Comentarios</label>
+                        <textarea id="comentarios" rows="3"></textarea>
+                    </div>
+                </div>
+                <!-- === BLOQUE DINÁMICO QUEJA COMPLETO === -->
+                <div id="bloqueQueja" style="display:none; border:1px solid #808080; padding:10px; margin-top:10px; background:#e9e9e9;">
+
+                    <!-- FILA 1 -->
+                    <div class="form-row">
+                        <div class="f-group">
+                            <label>Causal:</label>
+                            <select style="width:180px;">
+                                <option>&lt;SELECCIONAR&gt;</option>
+                            </select>
+                        </div>
+
+                        <div class="f-group">
+                            <label>Saldo:</label>
+                            <input type="text" value="$-0.51" style="width:80px;" readonly>
+                        </div>
+
+                        <div class="f-group">
+                            <label>Responsable Pago</label>
+                            <select style="width:140px;">
+                                <option>&lt;SELECCIONAR&gt;</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- FILA 2 -->
+                    <div class="form-row">
+                        <div class="f-group">
+                            <label>Aplica a:</label>
+                            <input type="text" value="POSTPAGO" style="width:100px;" readonly>
+                        </div>
+
+                        <div class="f-group">
+                            <label>Cliente Insiste</label>
+                            <input type="checkbox">
+                        </div>
+
+                        <div class="f-group">
+                            <label>Respuesta Inmediata</label>
+                            <input type="checkbox">
+                        </div>
+                    </div>
+
+                    <!-- FILA 3 -->
+                    <div class="form-row">
+                        <div class="f-group">
+                            <label>Valor solicitado:</label>
+                            <input type="text" style="width:120px;">
+                        </div>
+                    </div>
+
+                    <!-- PERIODOS EN RECLAMACION -->
+                    <div style="border:1px solid #808080; padding:8px; margin-top:10px; background:#f5f5f5;">
+                        <strong>Períodos en Reclamación</strong>
+
+                        <div class="form-row" style="margin-top:5px;">
+                            <div class="f-group">
+                                <label>Desde:</label>
+                                <input type="text" value="15" style="width:40px;">
+                            </div>
+
+                            <div class="f-group">
+                                <label>Hasta:</label>
+                                <input type="text" value="15" style="width:40px;">
+                            </div>
+
+                            <button class="btn-red-form" onclick="agregarPeriodo()">Agregar</button>
+                            <button class="btn-red-form" onclick="eliminarPeriodo()">Eliminar</button>
+                        </div>
+                    </div>
+
+                    <!-- TABLA PERIODOS ASOCIADOS -->
+                    <div style="border:1px solid #808080; margin-top:10px;">
+                        <div style="background:#c62828; color:white; padding:3px; font-weight:bold;">
+                            Desde&nbsp;&nbsp;&nbsp;&nbsp;Hasta
+                        </div>
+
+                        <div id="tablaPeriodos" style="min-height:60px; padding:5px; background:white;"></div>
+
+                        <div style="padding:5px;">
+                            <input type="checkbox"> Seleccionar Todos
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="footer-actions">
+                    <button class="btn-win red">Limpiar</button>
+                    <button class="btn-win red" onclick="abrirResumen()">Guardar</button>
+                    <button class="btn-win red">Salir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // FUNCIONES PARA EL APARTADO DE DIRECCIONES
+    function abrirDirecciones() {
+        document.getElementById('modalDirecciones').style.display = 'flex';
+    }
+
+    function cerrarDirecciones() {
+        document.getElementById('modalDirecciones').style.display = 'none';
+    }
+    // TUS VALIDACIONES ORIGINALES
+    const tipologia = document.getElementById('tipologia');
+   const tpqr = document.getElementById('t-pqr');
+    const bloqueQueja = document.getElementById('bloqueQueja');
+
+    tpqr.addEventListener('change', function() {
+        if (this.value === "Queja") {
+            bloqueQueja.style.display = "block";
+        } else {
+            bloqueQueja.style.display = "none";
+        }
+    });
+    const solicitud = document.getElementById('solicitud');
+    const area = document.getElementById('area-responsable');
+
+    tipologia.addEventListener('change', function() {
+        if (this.value !== "peticion" && this.value !== "") {
+            alert("Acceso denegado. Tipología bloqueada.");
+            this.value = "";
+        }
+    });
+
+    solicitud.addEventListener('change', function() {
+        if (this.value !== "terminacion" && this.value !== "") {
+            alert("Selección no permitida para su perfil actual.");
+            this.value = "";
+        }
+    });
+
+    area.addEventListener('change', function() {
+        if (this.value !== "inbound" && this.value !== "") {
+            alert("Área no disponible. Solo se permite COLOMBIANOUTS-INBOUND.");
+            this.value = "";
+        }
+    });
+    /* === GENERADOR IA === */
+    function generarTextoIA() {
+
+    const textoPrincipal = "Se comunica el Sr. XXX a realizar la cancelación del servicio debido a motivos económicos, se realizan ofrecimientos de NBO, se ofrece cesión de contrato, se resaltan beneficios, cliente continúa con la intención de cancelación, se le informa que quedará realizado a partir del siguiente corte de facturación.";
+
+    document.getElementById("hechos").value = textoPrincipal;
+
+    document.getElementById("requerimientos").value =
+        "Se solicita cancelación del servicio conforme a intención expresa del cliente.";
+
+    document.getElementById("comentarios").value =
+        "Cliente informado sobre condiciones de cancelación y fecha efectiva según próximo corte de facturación.";
+    }
+    /* === FUNCIONES MODAL RESUMEN === */
+
+    function abrirResumen() {
+        document.getElementById("modalResumen").style.display = "flex";
+    }
+
+    function cerrarResumen() {
+        document.getElementById("modalResumen").style.display = "none";
+    }
+
+    function confirmarRadicacion() {
+    document.getElementById("modalResumen").style.display = "none";
+    document.getElementById("modalExito").style.display = "flex";
+    }
+
+    function cerrarExito() {
+    document.getElementById("modalExito").style.display = "none";
+    }
+
+</script>
+<!-- === MODAL RESUMEN RADICACION === -->
+<div class="modal-resumen-overlay" id="modalResumen">
+    <div class="modal-resumen">
+        <h2>RESUMEN RADICACIÓN PQR</h2>
+
+        <div class="resumen-grid">
+            <div class="resumen-box">
+                <strong>Tipo de Petición:</strong><br>
+                PETICION
+            </div>
+            <div class="resumen-box">
+                <strong>Reclamo:</strong><br>
+                PETICION
+            </div>
+            <div class="resumen-box">
+                <strong>Titular:</strong><br>
+                VICTOR DAN DELGADO RESTREPO
+            </div>
+            <div class="resumen-box">
+                <strong>Remitente:</strong><br>
+                VICTOR DAN DELGADO RESTREPO
+            </div>
+        </div>
+
+        <div class="resumen-box" style="margin-bottom:10px;">
+            <strong>Dirección Principal:</strong><br>
+            26-50 APT 809 - BOGOTA / CUNDINAMARCA
+        </div>
+
+        <div style="text-align:center; font-weight:bold; color:red; margin-top:10px;">
+            ¿ESTÁ SEGURO DE QUERER RADICAR ESTA SOLICITUD?
+        </div>
+
+        <div class="resumen-footer">
+            <button onclick="confirmarRadicacion()">SI</button>
+            <button onclick="cerrarResumen()">CORREGIR</button>
+            <button onclick="cerrarResumen()">SALIR</button>
+        </div>
+    </div>
+</div>
+    <!-- === MODAL RADICACION EXITOSA === -->
+<div class="modal-exito-overlay" id="modalExito">
+    <div class="modal-exito">
+        <h3>RADICACIÓN</h3>
+        <p>La radicación fue registrada con éxito!</p>
+
+        <div class="numero-radicado">
+            NR / CUN: 4488200001847787
+        </div>
+
+        <div>
+            Fecha NAO Cliente: 03/07/2020
+        </div>
+
+        <div class="modal-exito-buttons">
+            <button onclick="alert('Mostrando resumen...')">Resumen</button>
+            <button onclick="alert('Escalamiento generado')">Escalamiento</button>
+            <button onclick="cerrarExito()">Aceptar</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
+

@@ -4,6 +4,52 @@
     <meta charset="UTF-8">
     <title>AC Administración de Clientes - Simulador</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Estilos para el aviso informativo (Nube) */
+        .pqr-hint-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .pqr-cloud {
+            position: absolute;
+            top: 35px; /* Aparece debajo del botón */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2b5797; /* Azul profesional */
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-weight: bold;
+            border: 1px solid #1e3a5f;
+        }
+
+        /* Triangulito de la nube */
+        .pqr-cloud::after {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent #2b5797 transparent;
+        }
+
+        /* Animación sutil */
+        @keyframes pulse {
+            0% { opacity: 0.9; }
+            50% { opacity: 1; transform: translateX(-50%) translateY(-2px); }
+            100% { opacity: 0.9; }
+        }
+        .pqr-cloud {
+            animation: pulse 2s infinite ease-in-out;
+        }
+    </style>
 </head>
 <body class="legacy-body">
     <div class="main-window">
@@ -30,7 +76,12 @@
             <button class="t-btn">📝</button>
             <button class="t-btn">🗂️</button>
             <div class="v-sep"></div>
-            <button class="t-btn">🚫</button>
+            
+            <div class="pqr-hint-container">
+                <button class="t-btn" onclick="irPQR()">🚫</button>
+                <div class="pqr-cloud">DIRIGIRSE AL GESTOR DE PQR</div>
+            </div>
+
             <button class="t-btn">📱</button>
             <button class="t-btn">📠</button>
             <div class="tool-text">Invit. Fact. Elect.</div>
@@ -149,11 +200,17 @@
                         <div class="status-display"></div>
                         <button class="rect-btn-gold">Consultar QDN</button>
                         <button class="rect-btn" onclick="location.reload()">Refrescar</button>
-                        <button class="rect-btn">Salir</button>
+                        <button class="rect-btn" onclick="irPQR()">Salir</button>
                     </div>
                 </div>
             </main>
         </div>
     </div>
+
+    <script>
+        function irPQR() {
+            window.location.href = "pqr.html";
+        }
+    </script>
 </body>
 </html>

@@ -1,35 +1,225 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Gestión PQR</title>
-<link rel="stylesheet" href="css/styles.css">
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión PQR's</title>
+    <style>
+        /* Reset de estilos básicos */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
 
+        body {
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+
+        /* Contenedor principal estilo ventana */
+        .pqr-window {
+            width: 95%;
+            max-width: 1000px;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            min-height: 600px;
+        }
+
+        /* Encabezado superior */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Imagen del logo corregida */
+        .logo-claro {
+            width: 70px; /* Tamaño optimizado según imagen */
+            height: auto;
+            object-fit: contain;
+        }
+
+        .header-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .header-right {
+            text-align: right;
+            font-size: 11px;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .user-bold {
+            font-weight: bold;
+            color: #000;
+            font-size: 12px;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* Barra de navegación secundaria */
+        .nav-bar {
+            background-color: #ffffff;
+            border-bottom: 1px solid #ddd;
+            padding: 5px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Contenido Central */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+        }
+
+        .central-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 35px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Cuadro de selección */
+        .selection-card {
+            border: 1px solid #e0e0e0;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            background-color: #fff;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+
+        .selection-card label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .pqr-select {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #999;
+            margin-bottom: 25px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        /* Botón Rojo Estilo Claro */
+        .btn-aceptar {
+            background: linear-gradient(to bottom, #e1251b, #b31d16);
+            color: white;
+            border: 1px solid #8a1711;
+            padding: 8px 35px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+
+        .btn-aceptar:hover {
+            background: #d11f16;
+        }
+
+        /* Marca de agua Activar Windows */
+        .windows-watermark {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            color: #ccc;
+            font-size: 13px;
+            text-align: right;
+            line-height: 1.2;
+            pointer-events: none; /* No interfiere con clics */
+        }
+    </style>
+</head>
 <body>
 
-<div class="container">
+    <div class="pqr-window">
+        <header class="header">
+            <div class="header-left">
+                <img src="img/logo claro.svg" alt="Claro" class="logo-claro">
+                <span class="header-title">Gestión PQR´s</span>
+            </div>
+            <div class="header-right">
+                Versión: 4.8.0.1<br>
+                28/07/2023 11:49:40<br>
+                <span class="user-bold">Usuario: EC0823E - Nombre: INGRID DANIELA PRIETO GORDILLO (GROUPCOS) - Perfil: ACRETENCIONTEMP</span>
+            </div>
+        </header>
 
-    <h1>GESTIÓN PQR</h1>
+        <div class="nav-bar">
+            <span>Selección Servicio</span>
+            <span>▼ x</span>
+        </div>
 
-    <div class="card">
+        <main class="main-content">
+            <div class="central-title">SISTEMA DE PETICIONES QUEJAS Y RECURSOS</div>
 
-        <h2>Seleccione el servicio</h2>
+            <div class="selection-card">
+                <label>SELECCIONE EL SERVICIO A TRABAJAR EN PQR:</label>
+                <select id="servicio-pqr" class="pqr-select">
+                    <option value="">&lt;SELECCIONAR&gt;</option>
+                    <option value="RED MOVIL">1 RED MOVIL</option>
+                    <option value="TRAMITES ESPECIALES">2 TRAMITES ESPECIALES</option>
+                    <option value="TRAMITES OTROS">3 TRAMITES OTROS</option>
+                    <option value="MULTIPLAY">4 MULTIPLAY</option>
+                </select>
+                <br>
+                <button class="btn-aceptar" onclick="validarYRedirigir()">ACEPTAR</button>
+            </div>
+        </main>
 
-        <button class="btn" onclick="irRedMovil()">1 RED MOVIL</button>
-        <button class="btn disabled">2 TRAMITES ESPECIALES</button>
-        <button class="btn disabled">3 TRAMITES OTROS</button>
-        <button class="btn disabled">4 MULTIPLAY</button>
-
+        <div class="windows-watermark">
+            Activar Windows<br>
+            Ve a Configuración para activar...
+        </div>
     </div>
 
-</div>
+    <script>
+        function validarYRedirigir() {
+            const seleccion = document.getElementById('servicio-pqr').value;
 
-<script>
-function irRedMovil(){
-    window.location.href = "procesos.html";
-}
-</script>
-
+            if (seleccion === "RED MOVIL") {
+                // Redirección a radicar.html
+                window.location.href = "radicar.html";
+            } else if (seleccion === "") {
+                alert("Por favor, seleccione un servicio para continuar.");
+            } else {
+                // Por si el usuario intenta seleccionar una opción deshabilitada
+                alert("Este servicio no está disponible actualmente.");
+            }
+        }
+    </script>
 </body>
 </html>

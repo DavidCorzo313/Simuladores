@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Simulador Gestor PQR</title>
+
+<style>
+body{
+    margin:0;
+    font-family:'Segoe UI', Tahoma, sans-serif;
+    background:#e9e9e9;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.container{
+    text-align:center;
+}
+
+.logos{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:60px;
+    margin-bottom:30px;
+}
+
+.logos img{
+    height:120px;
+}
+
+h1{
+    font-size:70px;
+    font-weight:400;
+    margin:0;
+    color:#000;
+}
+
+.subtitle{
+    font-size:35px;
+    margin-top:10px;
+    color:#000;
+}
+
+.btn-start{
+    margin-top:40px;
+    background:#c41212;
+    color:white;
+    border:none;
+    padding:15px 45px;
+    font-size:22px;
+    border-radius:40px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.btn-start:hover{
+    background:#a50f0f;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="logos">
+        <img src="img/logo.png" alt="Administración de Clientes">
+        <img src="img/logo claro.svg" alt="Claro">
+    </div>
+
+    <h1>Simulador Gestor PQR</h1>
+    <div class="subtitle">Formación Retención Convergente</div>
+
+    <button class="btn-start" onclick="empezar()">Empezamos</button>
+
+</div>
+
+<script>
+function empezar(){
+    window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>
